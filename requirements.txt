@@ -1,0 +1,32 @@
+# SentinelEdge — Stage I dev dependencies
+# (Stage II adds hailo-platform / hailort / hailo-model-zoo via vendor SDK)
+
+# Core CV / detection
+ultralytics>=8.3.0
+opencv-python-headless>=4.10.0
+numpy>=1.26.0
+Pillow>=10.3.0
+
+# Video I/O
+av>=12.0.0            # PyAV for RTSP decode (uses system FFmpeg)
+
+# Local LLM for bilingual report (Stage I: CPU; Stage II: CPU with int8)
+llama-cpp-python>=0.3.0
+
+# Config / orchestration
+pyyaml>=6.0
+pydantic>=2.7.0
+rich>=13.7.0          # pretty logs for demo video
+
+# Output sinks
+paho-mqtt>=2.1.0
+httpx>=0.27.0         # LINE Notify / Teams webhook
+
+# Dev / testing
+pytest>=8.2.0
+ruff>=0.5.0
+
+# ----- Stage II (install on target host with vendor access) -----
+# hailo-platform
+# hailort
+# hailo-model-zoo

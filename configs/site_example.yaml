@@ -1,0 +1,37 @@
+# Example site config. Each real deployment has its own file.
+site: taichung_plant_01
+
+model:
+  weights: yolov8n.pt   # replace with Hailo-compiled HEF in Stage II
+
+zones:
+  - name: crane_zone
+    camera: CAM-42
+    polygon: [[0.3, 0.1], [0.9, 0.1], [0.9, 0.9], [0.3, 0.9]]
+    rules: [helmet_mandatory, lone_worker_forbidden]
+
+  - name: loading_bay
+    camera: CAM-07
+    polygon: [[0.0, 0.5], [1.0, 0.5], [1.0, 1.0], [0.0, 1.0]]
+    rules: [reflective_vest_mandatory]
+
+policies:
+  min_dwell_frames: 15      # ~0.5s @ 30fps
+  helmet_confidence: 0.5
+  min_track_age: 10
+
+reporter:
+  model_path: null          # drop a Qwen2.5-0.5B.gguf path here for live LLM
+  n_ctx: 1024
+  n_threads: 4
+
+outputs:
+  mqtt:
+    enabled: false
+    host: localhost
+    port: 1883
+    topic: sentinel/events
+  line:
+    token: null             # set your LINE Notify token
+  teams:
+    webhook: null           # set your Teams incoming webhook URL
