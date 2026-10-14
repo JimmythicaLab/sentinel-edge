@@ -27,14 +27,29 @@ class Detector:
 class TorchDetector(Detector):
     """PyTorch object-detector backend. Convenient for dev; not latency-optimised."""
 
-    def __init__(self, weights: str) -> None:
+    def __init__(
+        self,
+        weights: str,
+        tracker: str = "botsort.yaml",
+        conf: float = 0.25,
+        iou: float = 0.5,
+    ) -> None:
         from ultralytics import YOLO
 
         self.model = YOLO(weights)
+        self.tracker = tracker
+        self.conf = conf
+        self.iou = iou
 
     async def stream(self, source):  # type: ignore[override]
         results = self.model.track(
-            source=source, stream=True, persist=True, verbose=False,
+            source=source,
+            stream=True,
+            persist=True,
+            tracker=self.tracker,
+            conf=self.conf,
+            iou=self.iou,
+            verbose=False,
         )
         for i, r in enumerate(results):
             dets: list[Detection] = []

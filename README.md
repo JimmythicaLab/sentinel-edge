@@ -112,7 +112,11 @@ open webdemo/index.html     # macOS
 # or just double-click the file in Finder / Explorer
 ```
 
-A standalone static HTML / CSS / JS dashboard that mirrors the production SentinelOps UI — four live camera feeds (CAM-01 / 07 / 23 / 42), event stream panel, LLM report modal, LINE Notify popup, and four tabs (Live Monitoring / Event History / Rule Settings / Site Management). The **▶ Simulate Violation Event** button triggers a full detection → alert → report → push sequence against the real camera footage. No build step, no backend; opens straight from `file://`.
+A standalone static HTML / CSS / JS dashboard that mirrors the production SentinelOps UI — four live camera feeds (CAM-01 / 07 / 23 / 42), event stream panel, LLM report modal, LINE Notify popup, and four tabs (Live Monitoring / Event History / Rule Settings / Site Management).
+
+**The CAM-42 overlay is not hand-placed CSS.** `scripts/export_webdemo_tracks.py` runs the project's object detector + tracker across `assets/sample_factory.mp4` and writes `webdemo/assets/tracks/cam42.js` — per-frame bounding boxes with persistent `track_id`, confidence, and class. The dashboard reads `video.currentTime`, looks up the matching frame, and animates the real detections on top of the video. The same rule engine (`restricted_access`, 12-frame dwell, 240-frame cooldown) runs client-side and fires the ALERT → REPORT → PUSH sequence when a track dwells inside the zone.
+
+The **▶ Simulate Violation Event** button rewinds the clip to let the reviewer watch the rule fire from the top. No build step, no backend; opens straight from `file://`.
 
 ### Try the live demo (recommended for reviewers)
 
@@ -147,7 +151,7 @@ python -m src.inference \
 
 Events print to stdout and are dispatched via any output sink enabled in `configs/site_example.yaml` (MQTT / LINE Notify / Teams Webhook — all `null` by default so no network calls happen out of the box).
 
-For the LLM report path, drop a `qwen2.5-0.5b.gguf` under `reporter.model_path` in the config. If no model file is present the reporter falls back to a deterministic rule-aware template.
+For the LLM report path, point `reporter.model_path` at any GGUF-format small language model (≤1B parameters recommended). If no model file is present the reporter falls back to a deterministic rule-aware template.
 
 Flags:
 - `--source path/to/video.mp4` — use your own clip
@@ -208,9 +212,9 @@ Team members are listed on the Stage I submission pitch deck.
 
 Code: Apache 2.0. Upstream model and runtime licenses:
 
-- Open-source object detection framework — AGPL-3.0 (commercial license available from the upstream vendor for productization)
-- Qwen2.5-0.5B — Apache 2.0
-- llama.cpp — MIT
+- Open-source object-detection framework (AGPL-3.0 upstream; a commercial license is available from the vendor for productization)
+- Small language model weights (GGUF, ≤1B parameters) — permissive license, swappable at deploy time
+- GGUF inference runtime — MIT
 - Hailo Dataflow Compiler / HailoRT — vendor license (Stage II access via ASUS / Hailo partnership)
 
 Demo video samples auto-downloaded by `scripts/demo.py` are stock footage from Pexels (Pexels License — free for commercial and non-commercial use with no attribution required). Reviewers who prefer their own footage can pass `--source path/to/video.mp4`.

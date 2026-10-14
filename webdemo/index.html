@@ -86,26 +86,22 @@
     <div class="feed-container">
       <video id="mainVideo" src="assets/videos/cam42.mp4" muted autoplay loop playsinline></video>
 
-      <!-- Detection overlays (hidden until triggered) -->
-      <div class="detection-overlay" id="detectionOverlay">
-        <div class="detbox">
-          <div class="detbox-label">person · 0.94</div>
-          <div class="nohelmet">⚠ NO HELMET DETECTED</div>
-        </div>
-      </div>
+      <!-- SVG zone polygon + bounding boxes injected by JS from assets/tracks/<cam>.json -->
+      <svg class="zone-layer" id="zoneLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+      <div class="box-layer" id="boxLayer"></div>
 
       <div class="alert-ribbon" id="alertRibbon">
         <div class="alert-icon">!</div>
         <div class="alert-msg">
-          <div class="alert-kind">ALERT · HELMET_MANDATORY · CAM-42</div>
-          <div class="alert-text">Unprotected worker detected in restricted zone</div>
+          <div class="alert-kind" id="alertKind">ALERT · RESTRICTED_ACCESS · CAM-42</div>
+          <div class="alert-text" id="alertText">Person #1 in restricted_zone for 15 frames</div>
         </div>
         <div class="alert-latency">80 ms</div>
       </div>
 
       <div class="feed-status">
         <span class="rec">● REC</span>
-        <span>1920×1080 · H.264 · 30fps</span>
+        <span id="feedStatus">1280×720 · H.264 · 24fps · track replay</span>
       </div>
     </div>
   </section>
@@ -380,6 +376,7 @@
   </div>
 </div>
 
+<script src="assets/tracks/cam42.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -229,49 +229,68 @@ button { font-family: inherit; cursor: pointer; border: none; }
   object-fit: cover; display: block;
 }
 
-/* Detection overlay */
-.detection-overlay {
+/* Zone + bounding box live overlay (driven by assets/tracks/<cam>.json) */
+.zone-layer {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+.zone-layer polygon {
+  fill: rgba(255, 90, 31, 0.08);
+  stroke: var(--accent);
+  stroke-width: 0.35;
+  stroke-dasharray: 1.4 1.0;
+  stroke-linejoin: round;
+  animation: zoneDash 1.4s linear infinite;
+}
+@keyframes zoneDash { to { stroke-dashoffset: -4.8; } }
+.zone-label {
+  position: absolute;
+  background: rgba(255,90,31,0.92); color: #fff;
+  padding: 3px 10px; border-radius: 5px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px; letter-spacing: 0.1em;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.box-layer {
   position: absolute; inset: 0;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
+  z-index: 5;
 }
-.detection-overlay.show { opacity: 1; }
-
-.detbox {
+.bbox {
   position: absolute;
-  left: 32%; top: 28%;
-  width: 180px; height: 320px;
-  border: 3px solid var(--accent);
-  border-radius: 4px;
-  box-shadow: 0 0 32px rgba(255,90,31,0.55);
-  animation: detboxIn 0.4s;
+  border: 2px solid var(--green);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(16,185,129,0.35);
+  transition: left 0.05s linear, top 0.05s linear,
+              width 0.05s linear, height 0.05s linear;
 }
-@keyframes detboxIn {
-  from { transform: scale(1.3); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.bbox.in-zone {
+  border-color: var(--amber);
+  box-shadow: 0 0 14px rgba(245,158,11,0.5);
 }
-.detbox-label {
-  position: absolute; top: -30px; left: -3px;
-  background: var(--accent); color: #fff;
-  padding: 4px 10px; border-radius: 4px;
+.bbox.violating {
+  border-color: var(--rose);
+  box-shadow: 0 0 22px rgba(225,29,72,0.65);
+  animation: bboxPulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes bboxPulse {
+  from { box-shadow: 0 0 10px rgba(225,29,72,0.4); }
+  to   { box-shadow: 0 0 24px rgba(225,29,72,0.85); }
+}
+.bbox-label {
+  position: absolute; top: -22px; left: -2px;
+  background: var(--green); color: #06130d;
+  padding: 2px 8px; border-radius: 3px 3px 3px 0;
   font-family: "JetBrains Mono", monospace;
-  font-size: 13px; font-weight: 700;
+  font-size: 11px; font-weight: 700;
   white-space: nowrap;
 }
-.nohelmet {
-  position: absolute; top: 30px; left: calc(100% + 10px);
-  background: var(--rose); color: #fff;
-  padding: 8px 14px; border-radius: 6px;
-  font-size: 15px; font-weight: 700;
-  letter-spacing: 0.06em; white-space: nowrap;
-  box-shadow: 0 6px 18px rgba(225,29,72,0.4);
-  animation: popIn 0.4s 0.2s backwards;
-}
-@keyframes popIn {
-  from { opacity: 0; transform: scale(0.5); }
-  to { opacity: 1; transform: scale(1); }
-}
+.bbox.in-zone .bbox-label   { background: var(--amber); color: #1f1300; }
+.bbox.violating .bbox-label { background: var(--rose);  color: #fff; }
 
 /* Alert ribbon */
 .alert-ribbon {

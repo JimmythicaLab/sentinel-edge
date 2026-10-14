@@ -34,7 +34,7 @@ policies:
   cooldown_frames: 300      # ~10 s — one alert per track per window
 
 reporter:
-  model_path: null          # drop a Qwen2.5-0.5B.gguf path here for live LLM
+  model_path: null          # point at any GGUF small LM (≤1B params) for live reports
   n_ctx: 1024
   n_threads: 4
 
