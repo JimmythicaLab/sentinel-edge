@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SentinelOps · Industrial Safety Dashboard</title>
+<meta name="viewport" content="width=1920">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===================== TOP BAR ===================== -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">S</div>
+    <div class="name">SentinelOps<span> · Industrial Safety Dashboard</span></div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="live">Live Monitoring</button>
+    <button class="tab" data-tab="history">Event History</button>
+    <button class="tab" data-tab="rules">Rule Settings</button>
+    <button class="tab" data-tab="sites">Site Management</button>
+  </nav>
+  <div class="metrics">
+    <div class="metric"><span class="k">NPU</span><span class="v">68%</span></div>
+    <div class="metric"><span class="k">CPU</span><span class="v">42%</span></div>
+    <div class="metric"><span class="k">RAM</span><span class="v">3.2 / 8 GB</span></div>
+  </div>
+  <div class="live-pill"><span class="dot"></span>LIVE · 4 streams</div>
+</header>
+
+<!-- ===================== LIVE TAB ===================== -->
+<main class="page active" data-page="live">
+  <!-- Left: cameras sidebar -->
+  <aside class="cams">
+    <h3 class="side-head">Cameras</h3>
+
+    <div class="cam-card" data-cam="cam01">
+      <video src="assets/videos/cam01_small.mp4" muted autoplay loop playsinline></video>
+      <div class="cam-label">CAM-01</div>
+      <div class="cam-zone">Operations Room</div>
+      <div class="cam-dot ok"></div>
+    </div>
+
+    <div class="cam-card" data-cam="cam07">
+      <video src="assets/videos/cam07.mp4" muted autoplay loop playsinline></video>
+      <div class="cam-label">CAM-07</div>
+      <div class="cam-zone">Textile Floor A</div>
+      <div class="cam-dot ok"></div>
+    </div>
+
+    <div class="cam-card" data-cam="cam23">
+      <video src="assets/videos/cam23.mp4" muted autoplay loop playsinline></video>
+      <div class="cam-label">CAM-23</div>
+      <div class="cam-zone">Sewing Line B</div>
+      <div class="cam-dot ok"></div>
+    </div>
+
+    <div class="cam-card active" data-cam="cam42">
+      <video src="assets/videos/cam42.mp4" muted autoplay loop playsinline></video>
+      <div class="cam-label">CAM-42 ●</div>
+      <div class="cam-zone">Loading Bay 3</div>
+      <div class="cam-dot ok"></div>
+    </div>
+
+    <button class="trigger-btn" id="trigger">
+      ▶ Simulate Violation Event
+    </button>
+
+    <div class="side-stats">
+      <div class="side-stat">
+        <div class="s-k">Alerts today</div>
+        <div class="s-v">7</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Center: main camera feed -->
+  <section class="main-feed">
+    <div class="feed-header">
+      <div class="cam-title" id="mainCamTitle">
+        CAM-42 <span>· Loading Bay 3 · Helmet Mandatory</span>
+      </div>
+      <div class="feed-time" id="feedTime">2026-10-14 23:47:00</div>
+    </div>
+
+    <div class="feed-container">
+      <video id="mainVideo" src="assets/videos/cam42.mp4" muted autoplay loop playsinline></video>
+
+      <!-- Detection overlays (hidden until triggered) -->
+      <div class="detection-overlay" id="detectionOverlay">
+        <div class="detbox">
+          <div class="detbox-label">person · 0.94</div>
+          <div class="nohelmet">⚠ NO HELMET DETECTED</div>
+        </div>
+      </div>
+
+      <div class="alert-ribbon" id="alertRibbon">
+        <div class="alert-icon">!</div>
+        <div class="alert-msg">
+          <div class="alert-kind">ALERT · HELMET_MANDATORY · CAM-42</div>
+          <div class="alert-text">Unprotected worker detected in restricted zone</div>
+        </div>
+        <div class="alert-latency">80 ms</div>
+      </div>
+
+      <div class="feed-status">
+        <span class="rec">● REC</span>
+        <span>1920×1080 · H.264 · 30fps</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Right: event stream -->
+  <aside class="events-panel">
+    <div class="events-head">
+      <h3>Event Stream</h3>
+      <span class="live-tag">LIVE</span>
+    </div>
+    <div class="events-list" id="eventsList">
+      <div class="event info">
+        <div class="ev-head"><span class="ev-time">23:46:12</span><span class="ev-tag">INFO</span></div>
+        <div class="ev-body">4 streams stable · NPU 68% utilization</div>
+      </div>
+      <div class="event info muted">
+        <div class="ev-head"><span class="ev-time">23:45:33</span><span class="ev-tag">INFO</span></div>
+        <div class="ev-body">CAM-07: person tracked (compliant)</div>
+      </div>
+      <div class="event info muted">
+        <div class="ev-head"><span class="ev-time">23:44:08</span><span class="ev-tag">STATS</span></div>
+        <div class="ev-body">Uptime 7d 14h · 0 inference failures</div>
+      </div>
+      <div class="event info muted">
+        <div class="ev-head"><span class="ev-time">23:42:51</span><span class="ev-tag">INFO</span></div>
+        <div class="ev-body">Firewall-closed mode active · no cloud egress</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- LINE Notify popup (hidden by default) -->
+  <div class="line-popup" id="linePopup">
+    <div class="line-head">
+      <div class="line-avatar">L</div>
+      <div class="line-name">SentinelOps · EHS Group</div>
+      <div class="line-time">23:47</div>
+    </div>
+    <div class="line-body">
+      <p><strong>⚠ [CAM-42 Loading Bay 3]</strong> Unprotected worker detected in crane zone for 15 frames. Supervisor dispatch and PPE briefing recommended.</p>
+    </div>
+    <div class="line-snapshot">
+      📷 CAM-42 snapshot
+    </div>
+  </div>
+</main>
+
+<!-- ===================== HISTORY TAB ===================== -->
+<main class="page" data-page="history">
+  <div class="history-wrap">
+    <div class="page-head">
+      <h2>Event History</h2>
+      <div class="filters">
+        <select><option>All cameras</option><option>CAM-42</option><option>CAM-07</option></select>
+        <select><option>All types</option><option>ALERT</option><option>REPORT</option><option>INFO</option></select>
+        <select><option>Last 7 days</option><option>Today</option><option>Last 24h</option></select>
+      </div>
+    </div>
+
+    <table class="history-table">
+      <thead>
+        <tr><th>Time</th><th>Camera</th><th>Zone</th><th>Kind</th><th>Severity</th><th>Dispatched</th></tr>
+      </thead>
+      <tbody id="historyTbody">
+        <tr><td class="mono">2026-10-14 23:47:01</td><td>CAM-42</td><td>crane_zone</td><td><span class="tag alert">HELMET_MANDATORY</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
+        <tr><td class="mono">2026-10-14 21:12:34</td><td>CAM-07</td><td>forklift_radius</td><td><span class="tag alert">RESTRICTED_ACCESS</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT</td></tr>
+        <tr><td class="mono">2026-10-14 18:05:22</td><td>CAM-23</td><td>confined_space</td><td><span class="tag info">LONE_WORKER</span></td><td class="sev-med">MED</td><td>LINE</td></tr>
+        <tr><td class="mono">2026-10-14 14:33:17</td><td>CAM-42</td><td>crane_zone</td><td><span class="tag alert">VEST_MANDATORY</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
+        <tr><td class="mono">2026-10-14 10:21:09</td><td>CAM-07</td><td>textile_floor</td><td><span class="tag info">PERSON_COUNT</span></td><td class="sev-low">LOW</td><td>MQTT</td></tr>
+        <tr><td class="mono">2026-10-13 23:51:40</td><td>CAM-42</td><td>crane_zone</td><td><span class="tag alert">HELMET_MANDATORY</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
+        <tr><td class="mono">2026-10-13 19:44:11</td><td>CAM-23</td><td>sewing_line</td><td><span class="tag info">PERSON_COUNT</span></td><td class="sev-low">LOW</td><td>MQTT</td></tr>
+      </tbody>
+    </table>
+
+    <div class="history-stats">
+      <div class="h-stat"><div class="h-k">Events (7 days)</div><div class="h-v">37</div></div>
+      <div class="h-stat"><div class="h-k">High severity</div><div class="h-v">14</div></div>
+      <div class="h-stat"><div class="h-k">Avg response</div><div class="h-v">84 ms</div></div>
+      <div class="h-stat"><div class="h-k">False positive rate</div><div class="h-v">4.2%</div></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== RULES TAB ===================== -->
+<main class="page" data-page="rules">
+  <div class="rules-wrap">
+    <div class="page-head">
+      <h2>Rule Settings</h2>
+      <button class="btn-primary">+ Add Zone</button>
+    </div>
+
+    <div class="rules-grid">
+      <div class="rule-list">
+        <h3>Site: taichung_plant_01</h3>
+        <div class="rule-item active">
+          <div class="r-name">crane_zone (CAM-42)</div>
+          <div class="r-rules">helmet_mandatory · lone_worker_forbidden</div>
+        </div>
+        <div class="rule-item">
+          <div class="r-name">loading_bay (CAM-07)</div>
+          <div class="r-rules">reflective_vest_mandatory</div>
+        </div>
+        <div class="rule-item">
+          <div class="r-name">forklift_radius (CAM-07)</div>
+          <div class="r-rules">restricted_access · dwell_timer</div>
+        </div>
+        <div class="rule-item">
+          <div class="r-name">confined_space (CAM-23)</div>
+          <div class="r-rules">lone_worker_forbidden</div>
+        </div>
+      </div>
+
+      <div class="rule-editor">
+        <div class="editor-head">
+          <span>configs/site_example.yaml</span>
+          <span class="save-status">● saved</span>
+        </div>
+        <pre class="yaml-block"><span class="yk">site:</span> <span class="yv">taichung_plant_01</span>
+
+<span class="yk">model:</span>
+  <span class="yk">weights:</span> <span class="yv">yolov8n.pt</span>   <span class="yc"># Hailo HEF in Stage II</span>
+
+<span class="yk">zones:</span>
+  - <span class="yk">name:</span> <span class="yv">crane_zone</span>
+    <span class="yk">camera:</span> <span class="yv">CAM-42</span>
+    <span class="yk">polygon:</span> [[0.3, 0.1], [0.9, 0.1], [0.9, 0.9], [0.3, 0.9]]
+    <span class="yk">rules:</span> [<span class="yv">helmet_mandatory</span>, <span class="yv">lone_worker_forbidden</span>]
+
+  - <span class="yk">name:</span> <span class="yv">loading_bay</span>
+    <span class="yk">camera:</span> <span class="yv">CAM-07</span>
+    <span class="yk">polygon:</span> [[0.0, 0.5], [1.0, 0.5], [1.0, 1.0], [0.0, 1.0]]
+    <span class="yk">rules:</span> [<span class="yv">reflective_vest_mandatory</span>]
+
+<span class="yk">policies:</span>
+  <span class="yk">min_dwell_frames:</span> <span class="yn">15</span>      <span class="yc"># ~0.5s @ 30fps</span>
+  <span class="yk">helmet_confidence:</span> <span class="yn">0.5</span>
+
+<span class="yk">outputs:</span>
+  <span class="yk">mqtt:</span>
+    <span class="yk">enabled:</span> <span class="yv">true</span>
+    <span class="yk">topic:</span> <span class="yv">sentinel/events</span>
+  <span class="yk">line:</span>
+    <span class="yk">token:</span> <span class="yv">${LINE_NOTIFY_TOKEN}</span></pre>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== SITES TAB ===================== -->
+<main class="page" data-page="sites">
+  <div class="sites-wrap">
+    <div class="page-head">
+      <h2>Site Management</h2>
+      <button class="btn-primary">+ Add Site</button>
+    </div>
+
+    <div class="sites-grid">
+      <div class="site-card active">
+        <div class="site-head">
+          <div class="site-name">Taichung Plant 01</div>
+          <div class="site-badge">PILOT</div>
+        </div>
+        <div class="site-stats">
+          <div><span>Cameras</span><strong>4</strong></div>
+          <div><span>Modules</span><strong>1</strong></div>
+          <div><span>Uptime</span><strong>7d 14h</strong></div>
+          <div><span>Events (7d)</span><strong>37</strong></div>
+        </div>
+        <div class="site-hw">
+          UGen300-USB-8G · Hailo-10H · 2.5W · Firewall-closed
+        </div>
+      </div>
+
+      <div class="site-card placeholder">
+        <div class="site-head">
+          <div class="site-name" style="color:#5a6778;">Hsinchu Plant 02</div>
+          <div class="site-badge pending">PENDING</div>
+        </div>
+        <div class="site-stats">
+          <div><span>Cameras</span><strong>—</strong></div>
+          <div><span>Modules</span><strong>—</strong></div>
+          <div><span>Uptime</span><strong>—</strong></div>
+          <div><span>Events (7d)</span><strong>—</strong></div>
+        </div>
+        <div class="site-hw">
+          Awaiting Stage II hardware delivery
+        </div>
+      </div>
+
+      <div class="site-card placeholder">
+        <div class="site-head">
+          <div class="site-name" style="color:#5a6778;">Kaohsiung Site 03</div>
+          <div class="site-badge pending">PENDING</div>
+        </div>
+        <div class="site-stats">
+          <div><span>Cameras</span><strong>—</strong></div>
+          <div><span>Modules</span><strong>—</strong></div>
+          <div><span>Uptime</span><strong>—</strong></div>
+          <div><span>Events (7d)</span><strong>—</strong></div>
+        </div>
+        <div class="site-hw">
+          Pilot slot — Q1 2027 target
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== STATUS BAR ===================== -->
+<footer class="statusbar">
+  <div class="st-left">
+    <span class="st-item"><span class="k">Module</span> <strong>UGen300-USB-8G · Hailo-10H</strong></span>
+    <span class="st-item"><span class="k">Power</span> <strong>2.5 W</strong></span>
+    <span class="st-item"><span class="k">NPU</span>
+      <div class="st-bar"><div class="st-fill" style="width:68%"></div></div>
+      <strong>68%</strong>
+    </span>
+    <span class="st-item"><span class="k">CPU</span>
+      <div class="st-bar"><div class="st-fill" style="width:42%"></div></div>
+      <strong>42%</strong>
+    </span>
+    <span class="st-item"><span class="k">Uptime</span> <strong>7d 14h 32m</strong></span>
+  </div>
+  <div class="st-right">
+    <span class="st-item"><span class="k">Offline mode</span> <strong class="ok">● enabled</strong></span>
+    <span class="st-item"><span class="k">v</span> <strong>0.3.1-stage1</strong></span>
+  </div>
+</footer>
+
+<!-- ===================== EVENT DETAIL MODAL ===================== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">
+        <span class="modal-tag">LLM REPORT</span>
+        <span>Incident Summary · On-device Generated</span>
+      </div>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta">
+        <div><span>CAMERA</span><strong>CAM-42</strong></div>
+        <div><span>ZONE</span><strong>crane_zone</strong></div>
+        <div><span>TIME</span><strong>2026-10-14 23:47:01.420</strong></div>
+        <div><span>SEVERITY</span><strong class="sev-high">HIGH</strong></div>
+      </div>
+
+      <div class="lang-card">
+        <div class="lang-flag">ENGLISH</div>
+        <div class="lang-body">
+          Unprotected worker detected in crane zone on CAM-42 for 15 frames.
+          Supervisor dispatch and PPE briefing recommended.
+        </div>
+      </div>
+
+      <div class="lang-card">
+        <div class="lang-flag">繁體中文 · TRADITIONAL CHINESE</div>
+        <div class="lang-body">
+          [CAM-42 3號裝卸區] 偵測到人員未配戴安全帽,持續 15 幀。
+          建議通知現場主管並重新宣導 PPE 規範。
+        </div>
+      </div>
+
+      <div class="dispatch-block">
+        <strong>✓ Dispatched to:</strong>
+        LINE Notify · MQTT bus (sentinel/events) · on-site strobe · local JSONL audit log
+      </div>
+
+      <div class="snapshot-block">
+        <div class="snapshot-label">📷 Incident snapshot</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

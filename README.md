@@ -55,6 +55,7 @@ End-to-end budget (Stage II target): frame → alert ≈ 80 ms. Written report i
 │   ├── reporter.py         # Local bilingual LLM reporter (template fallback)
 │   └── outputs.py          # MQTT / LINE / Teams sinks
 ├── scripts/
+│   ├── demo.py             # Live OpenCV demo with real YOLOv8 inference
 │   ├── bench_torch.py      # Torch backend latency / FPS benchmark
 │   ├── export_onnx.py      # Export detector / pose to ONNX for Hailo
 │   └── compile_hailo.sh    # Reference Hailo Dataflow Compiler flow
@@ -63,6 +64,13 @@ End-to-end budget (Stage II target): frame → alert ≈ 80 ms. Written report i
 │   └── test_reporter.py    # Template-fallback smoke tests
 ├── configs/
 │   └── site_example.yaml   # Per-site config (zones, rules, outputs)
+├── assets/
+│   └── sample_factory.mp4  # 8s CCTV-style sample used by scripts/demo.py
+├── webdemo/                # Static web-based SentinelOps dashboard mockup
+│   ├── index.html          # Dashboard shell: 4 tabs, 4 cams, event stream
+│   ├── css/style.css       # ASUS-orange corporate style
+│   ├── js/app.js           # Tab routing, event trigger, modal, LINE popup
+│   └── assets/videos/      # Four looping camera feeds (CAM-01/07/23/42)
 ├── benchmark.md            # Reference baselines + Stage II target table
 └── requirements.txt
 ```
@@ -85,13 +93,22 @@ pytest tests/ -v
 
 Expected: `8 passed in <1s`. These exercise the rule-engine geometry, dwell counters, and the reporter's template-fallback path — none of them require model weights or hardware.
 
+### Open the web dashboard (no install needed)
+
+```bash
+open webdemo/index.html     # macOS
+# or just double-click the file in Finder / Explorer
+```
+
+A standalone static HTML / CSS / JS dashboard that mirrors the production SentinelOps UI — four live camera feeds (CAM-01 / 07 / 23 / 42), event stream panel, LLM report modal, LINE Notify popup, and four tabs (Live Monitoring / Event History / Rule Settings / Site Management). The **▶ Simulate Violation Event** button triggers a full detection → alert → report → push sequence against the real camera footage. No build step, no backend; opens straight from `file://`.
+
 ### Try the live demo (recommended for reviewers)
 
 ```bash
 python scripts/demo.py
 ```
 
-This is the fastest way to see the pipeline end-to-end. It downloads a short factory sample video on first run, loads YOLOv8-n, and opens an OpenCV window that mirrors the production dashboard — orange detection boxes with per-person track IDs, dashed `RESTRICTED ZONE` overlay, a sliding red alert ribbon when a person dwells past the threshold, and bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
+This is the fastest way to see the pipeline end-to-end *with real inference*. It uses the bundled `assets/sample_factory.mp4`, loads YOLOv8-n, and opens an OpenCV window that mirrors the production dashboard — orange detection boxes with per-person track IDs, dashed `RESTRICTED ZONE` overlay, a sliding red alert ribbon when a person dwells past the threshold, and bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
 
 The Stage I demo uses the `restricted_access` rule because the shipped COCO weights only expose a `person` class. The rule engine already supports `helmet_mandatory`, `reflective_vest_mandatory`, and `lone_worker_forbidden`; Stage II flips the rule in `configs/site_example.yaml` once a helmet-trained checkpoint is in place.
 
