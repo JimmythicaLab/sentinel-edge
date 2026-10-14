@@ -11,6 +11,25 @@ On-prem industrial safety analytics for the ASUS UGen300 USB AI Accelerator (Hai
 
 Stage I submission for the **2026 ASUS UGen AI League — Battlefield Lightning × Workplace AI**.
 
+---
+
+<table>
+<tr>
+<td width="50%" align="center">
+<b>SentinelOps web dashboard</b><br/>
+<sub>4-stream monitoring · event stream · rule editor · multi-site · <code>open webdemo/index.html</code></sub><br/>
+<img src="docs/img/webdemo_dashboard.png" alt="SentinelOps dashboard"/>
+</td>
+<td width="50%" align="center">
+<b>Live inference</b><br/>
+<sub>YOLOv8-n + ByteTrack + rule engine on laptop CPU · ~30 ms per frame · <code>python scripts/demo.py</code></sub><br/>
+<img src="docs/img/live_detection.png" alt="Live detection overlay"/>
+</td>
+</tr>
+</table>
+
+---
+
 ## Scope
 
 - **Covered**: PPE compliance detection (helmet, hi-vis vest), polygon zone rules (restricted access, dwell timer, lone-worker-forbidden), bilingual incident reporting via MQTT / LINE Notify / Teams Webhook.
