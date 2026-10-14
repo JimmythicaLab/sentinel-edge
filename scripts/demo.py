@@ -44,6 +44,7 @@ from src.rule_engine import RuleEngine  # noqa: E402
 # ---------------------------------------------------------------------------
 #  Config
 # ---------------------------------------------------------------------------
+BUNDLED_SAMPLE = ROOT / "assets" / "sample_factory.mp4"
 SAMPLE_URLS = [
     "https://videos.pexels.com/video-files/3977979/3977979-sd_960_540_30fps.mp4",
     "https://videos.pexels.com/video-files/3209828/3209828-sd_640_360_25fps.mp4",
@@ -76,6 +77,10 @@ class Det:
 #  Download helpers
 # ---------------------------------------------------------------------------
 def download_sample() -> Path:
+    # Prefer the bundled sample so a fresh git clone works offline.
+    if BUNDLED_SAMPLE.exists():
+        return BUNDLED_SAMPLE
+
     SAMPLE_PATH.parent.mkdir(parents=True, exist_ok=True)
     if SAMPLE_PATH.exists():
         return SAMPLE_PATH
