@@ -146,12 +146,14 @@ Reference FP32 baselines and Stage II INT8-on-Hailo-10H targets are tracked in [
 
 ## Team
 
-| Role | Member |
-|---|---|
-| AI Architect | 黃建勳 |
-| Computer Vision Engineer | 詹定璿 |
-| Data Scientist | 詹士緯 |
-| LLM Engineer | 高裕哲 |
+Four-person team covering the following roles:
+
+- AI Architect
+- Computer Vision Engineer
+- Data Scientist
+- LLM Engineer
+
+Team members are listed on the Stage I submission pitch deck.
 
 ## Licensing
 
