@@ -85,6 +85,21 @@ pytest tests/ -v
 
 Expected: `8 passed in <1s`. These exercise the rule-engine geometry, dwell counters, and the reporter's template-fallback path — none of them require model weights or hardware.
 
+### Try the live demo (recommended for reviewers)
+
+```bash
+python scripts/demo.py
+```
+
+Downloads a short factory sample video on first run, loads YOLOv8-n, and opens an OpenCV window that mirrors the production dashboard style — orange detection boxes, red `NO HELMET` label, sliding red alert ribbon, bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
+
+Flags:
+- `--source path/to/video.mp4` — use your own clip
+- `--headless` — skip the window (CI-friendly)
+- `--conf 0.4` — adjust detector confidence
+
+Press `q` or `Esc` to quit.
+
 ### Benchmark the Torch backend on your machine
 
 ```bash
