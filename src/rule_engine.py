@@ -63,6 +63,10 @@ class RuleEngine:
         self.zones = [Zone.from_dict(z) for z in zones]
         self.policies = policies
         self._dwell: dict[tuple[str, int, str], int] = {}
+        # Cooldown: last-fired frame per (zone, track_id, rule)
+        # Prevents the same worker from flooding alerts while they stay in
+        # the restricted zone — one alert per worker per window.
+        self._last_fired: dict[tuple[str, int, str], int] = {}
 
     # ------------------------------------------------------------------
     #  Public API
@@ -74,6 +78,7 @@ class RuleEngine:
 
         events: list[Event] = []
         min_dwell = int(self.policies.get("min_dwell_frames", 15))
+        cooldown = int(self.policies.get("cooldown_frames", 300))   # ~10s @ 30fps
 
         for zone in self.zones:
             persons_in_zone = [p for p in people if self._point_in_polygon(
@@ -85,6 +90,12 @@ class RuleEngine:
                 for p in violators:
                     key = (zone.name, p.track_id or -1, rule)
                     self._dwell[key] = self._dwell.get(key, 0) + 1
+
+                    # Cooldown: suppress repeat alerts for the same worker
+                    last = self._last_fired.get(key, -10**9)
+                    if frame_idx - last < cooldown:
+                        continue
+
                     if self._dwell[key] >= min_dwell:
                         events.append(
                             Event(
@@ -96,7 +107,8 @@ class RuleEngine:
                                 severity=zone.severity,
                             )
                         )
-                        # Reset dwell to debounce — one event per violation window
+                        self._last_fired[key] = frame_idx
+                        # Reset dwell so a brief re-entry has to re-accumulate
                         self._dwell[key] = 0
 
                 # Decay counters for persons that are no longer in the zone

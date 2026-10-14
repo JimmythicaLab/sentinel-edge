@@ -170,7 +170,7 @@ Four-person team covering the following roles:
 
 Team members are listed on the Stage I submission pitch deck.
 
-## Licensing
+## Licensing & Attribution
 
 Code: Apache 2.0. Upstream model and runtime licenses:
 
@@ -178,3 +178,5 @@ Code: Apache 2.0. Upstream model and runtime licenses:
 - Qwen2.5-0.5B — Apache 2.0
 - llama.cpp — MIT
 - Hailo Dataflow Compiler / HailoRT — vendor license (Stage II access via ASUS / Hailo partnership)
+
+Demo video samples auto-downloaded by `scripts/demo.py` are stock footage from Pexels (Pexels License — free for commercial and non-commercial use with no attribution required). Reviewers who prefer their own footage can pass `--source path/to/video.mp4`.

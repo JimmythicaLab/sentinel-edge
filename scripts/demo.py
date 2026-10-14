@@ -102,15 +102,12 @@ def download_sample() -> Path:
 #  Drawing helpers
 # ---------------------------------------------------------------------------
 def _draw_zone(frame, w: int, h: int, armed: bool):
-    """Draw the dashed helmet-mandatory zone overlay (bottom 60%, central 60%)."""
+    """Draw the dashed restricted-zone overlay (full frame for the Stage I demo)."""
     import cv2
 
-    x1, y1 = int(w * 0.2), int(h * 0.35)
-    x2, y2 = int(w * 0.8), int(h * 0.9)
-
-    overlay = frame.copy()
-    cv2.rectangle(overlay, (x1, y1), (x2, y2), ORANGE if armed else (120, 120, 120), -1)
-    cv2.addWeighted(overlay, 0.08, frame, 0.92, 0, dst=frame)
+    pad = 8
+    x1, y1 = pad, 50
+    x2, y2 = w - pad, h - 68
 
     # dashed border
     color = ORANGE if armed else (120, 120, 120)
@@ -121,7 +118,8 @@ def _draw_zone(frame, w: int, h: int, armed: bool):
         cv2.line(frame, (x1, j), (x1, min(j + 12, y2)), color, 2)
         cv2.line(frame, (x2, j), (x2, min(j + 12, y2)), color, 2)
 
-    cv2.putText(frame, "HELMET MANDATORY ZONE", (x1, y1 - 10),
+    cv2.putText(frame, "RESTRICTED ZONE  ·  dwell > 0.5s triggers alert",
+                (x1, y1 - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 1, cv2.LINE_AA)
     return (x1, y1, x2, y2)
 
@@ -149,23 +147,26 @@ def _draw_header(frame, w: int):
 
 
 def _draw_detection_box(frame, det: Det, w: int, h: int, violating: bool):
-    """Orange rectangle with class · confidence label."""
+    """Orange rectangle with class · confidence · track_id label."""
     import cv2
     x1, y1, x2, y2 = (int(v) for v in det.xyxy)
     color = RED if violating else ORANGE
     cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-    label = f"{det.cls} · {det.conf:.2f}"
+    label = f"{det.cls} #{det.track_id} · {det.conf:.2f}"
     (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
     cv2.rectangle(frame, (x1, y1 - th - 10), (x1 + tw + 10, y1), color, -1)
     cv2.putText(frame, label, (x1 + 5, y1 - 5),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, WHITE, 1, cv2.LINE_AA)
     if violating:
-        tag = "NO HELMET"
-        (tw2, th2), _ = cv2.getTextSize(tag, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 2)
-        cv2.rectangle(frame, (x2 + 8, y1 + 10),
-                      (x2 + tw2 + 20, y1 + th2 + 24), RED, -1)
-        cv2.putText(frame, tag, (x2 + 14, y1 + th2 + 18),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, WHITE, 2, cv2.LINE_AA)
+        tag = "IN RESTRICTED ZONE"
+        (tw2, th2), _ = cv2.getTextSize(tag, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+        # Place label above the box if there's no room to the right
+        tx = x2 + 8 if (x2 + tw2 + 24) < w else x1
+        ty = y1 + 10 if tx == x2 + 8 else y2 + th2 + 16
+        cv2.rectangle(frame, (tx, ty),
+                      (tx + tw2 + 16, ty + th2 + 14), RED, -1)
+        cv2.putText(frame, tag, (tx + 8, ty + th2 + 8),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, WHITE, 1, cv2.LINE_AA)
 
 
 def _draw_alert_ribbon(frame, w: int, h: int, latency_ms: int):
@@ -179,9 +180,9 @@ def _draw_alert_ribbon(frame, w: int, h: int, latency_ms: int):
     cv2.putText(frame, "!", (23, y + 36),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, WHITE, 2, cv2.LINE_AA)
 
-    cv2.putText(frame, "ALERT  ·  HELMET_MANDATORY  ·  CAM-42",
+    cv2.putText(frame, "ALERT  ·  RESTRICTED_ACCESS  ·  CAM-42",
                 (56, y + 22), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (220, 220, 255), 1, cv2.LINE_AA)
-    cv2.putText(frame, "Unprotected worker detected in restricted zone",
+    cv2.putText(frame, "Person detected in restricted zone (dwell > 0.5s)",
                 (56, y + 44), cv2.FONT_HERSHEY_SIMPLEX, 0.6, WHITE, 1, cv2.LINE_AA)
 
     lat = f"{latency_ms} ms"
@@ -202,14 +203,16 @@ def write_event(event_payload: dict):
 
 
 def print_report(event, dwell_frames: int):
-    en = (f"Unprotected worker detected in {event.zone} on {event.camera_id} "
-          f"for {dwell_frames} frames. Supervisor dispatch and PPE briefing "
+    tid = event.detections[0].track_id if event.detections else None
+    en = (f"Person #{tid} detected in {event.zone} on {event.camera_id} "
+          f"after {dwell_frames} frames of dwell. Supervisor review "
           f"recommended.")
-    zh = (f"[{event.camera_id} {event.zone}] 偵測到人員未配戴安全帽,持續 "
-          f"{dwell_frames} 幀。建議通知現場主管並重新宣導 PPE 規範。")
+    zh = (f"[{event.camera_id} {event.zone}] 偵測到人員 #{tid} 於限制區域停留 "
+          f"{dwell_frames} 幀,建議現場主管複查。")
     bar = "─" * 72
     print(f"\n{bar}")
-    print(f"⚠  ALERT · {event.kind} · {event.camera_id}  (dwell={dwell_frames} frames)")
+    print(f"⚠  ALERT · {event.kind} · {event.camera_id} · track #{tid}  "
+          f"(dwell={dwell_frames} frames)")
     print(f"{bar}")
     print(f"[EN] {en}")
     print(f"[ZH] {zh}")
@@ -221,6 +224,7 @@ def print_report(event, dwell_frames: int):
         "camera": event.camera_id,
         "zone": event.zone,
         "kind": event.kind,
+        "track_id": tid,
         "dwell_frames": dwell_frames,
         "severity": event.severity,
         "report_en": en,
@@ -265,18 +269,22 @@ def main():
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) or 960
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) or 540
 
-    # Zone covers most of the frame so any person in view triggers the rule.
-    # Stage I weights (COCO) have no `helmet` class, so helmet_mandatory
-    # effectively fires on any person inside the zone — exactly the Stage II
-    # behaviour once a helmet-trained checkpoint is swapped in.
+    # Stage I weights (COCO) only ship a `person` class — no helmet / vest.
+    # So for a honest demo we use the `restricted_access` rule: any person
+    # dwelling in a restricted zone fires an event. Stage II swaps in a
+    # helmet-trained checkpoint and switches the rule to `helmet_mandatory`
+    # without any other code change (rule engine already supports both).
     zones = [{
-        "name": "crane_zone",
+        "name": "restricted_zone",
         "camera": "CAM-42",
         "polygon": [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]],
-        "rules": ["helmet_mandatory"],
+        "rules": ["restricted_access"],
         "severity": "HIGH",
     }]
-    policies = {"min_dwell_frames": 12}       # ~0.5 s at 24 fps
+    policies = {
+        "min_dwell_frames": 12,       # ~0.5 s at 24 fps
+        "cooldown_frames": 240,       # ~10 s at 24 fps — one alert per worker
+    }
     engine = RuleEngine(zones, policies)
 
     alert_until = 0.0
