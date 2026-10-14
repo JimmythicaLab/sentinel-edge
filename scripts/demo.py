@@ -251,7 +251,7 @@ def main():
     ap = argparse.ArgumentParser(description="SentinelEdge live demo")
     ap.add_argument("--source", default="", help="Path to local video or RTSP URL")
     ap.add_argument("--weights", default="yolov8n.pt",
-                    help="Ultralytics checkpoint (auto-downloads)")
+                    help="Object-detector checkpoint (auto-downloads on first use)")
     ap.add_argument("--headless", action="store_true",
                     help="Skip the OpenCV window (useful for CI / headless servers)")
     ap.add_argument("--conf", type=float, default=0.35,

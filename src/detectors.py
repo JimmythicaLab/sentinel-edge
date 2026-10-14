@@ -25,7 +25,7 @@ class Detector:
 
 
 class TorchDetector(Detector):
-    """PyTorch Ultralytics backend. Convenient for dev; not latency-optimised."""
+    """PyTorch object-detector backend. Convenient for dev; not latency-optimised."""
 
     def __init__(self, weights: str) -> None:
         from ultralytics import YOLO

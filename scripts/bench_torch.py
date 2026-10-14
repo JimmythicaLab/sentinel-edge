@@ -21,10 +21,10 @@ from pathlib import Path
 
 
 def _resolve_source(source: str) -> str:
-    """Fall back to a tiny built-in COCO sample if no source is given."""
+    """Fall back to a tiny public demo image if no source is given."""
     if source and Path(source).exists():
         return source
-    # Ultralytics ships a demo bus image we can re-run many times.
+    # Public COCO bus demo image that re-runs cheaply for the benchmark loop.
     return "https://ultralytics.com/images/bus.jpg"
 
 

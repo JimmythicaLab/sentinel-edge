@@ -9,7 +9,7 @@
 | CHV       | ~1,300  | helmet / vest / person | lightweight detector | ~0.85 ± 0.05     | Roboflow Universe baseline |
 | SH17      | ~8,000  | 17 PPE classes         | lightweight detector | ~0.75 ± 0.05     | Author's released weights  |
 | Pictor-v3 | ~1,500  | construction PPE       | lightweight detector | ~0.70 ± 0.05     | Pictor benchmark           |
-| COCO-Pose | 200,000 | 17 keypoints           | pose estimator       | ~0.55 ± 0.05 OKS | Ultralytics docs           |
+| COCO-Pose | 200,000 | 17 keypoints           | pose estimator       | ~0.55 ± 0.05 OKS | upstream model docs        |
 
 > Baselines above are approximate figures from third-party sources. They have **not been reproduced on our pipeline yet**. Stage II work includes reproducing the FP32 baselines before measuring the INT8 drop.
 

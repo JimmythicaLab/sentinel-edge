@@ -5,7 +5,7 @@
 site: taichung_plant_01
 
 model:
-  weights: yolov8n.pt   # Stage I = generic COCO weights (person only).
+  weights: detector.pt  # Stage I = generic COCO weights (person only).
                         # Stage II: replace with the Hailo-compiled HEF of
                         # a helmet / vest-trained checkpoint.
 

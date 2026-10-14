@@ -1,4 +1,4 @@
-"""Export YOLOv8-n and YOLOv8-Pose-n to ONNX for the Hailo pipeline.
+"""Export the lightweight detector and pose model to ONNX for the Hailo pipeline.
 
 Produces artifacts/{detector,pose}.onnx. The Hailo Dataflow Compiler
 (installed on the Stage II workstation, not required locally) consumes

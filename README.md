@@ -120,7 +120,7 @@ A standalone static HTML / CSS / JS dashboard that mirrors the production Sentin
 python scripts/demo.py
 ```
 
-This is the fastest way to see the pipeline end-to-end *with real inference*. It uses the bundled `assets/sample_factory.mp4`, loads YOLOv8-n, and opens an OpenCV window that mirrors the production dashboard — orange detection boxes with per-person track IDs, dashed `RESTRICTED ZONE` overlay, a sliding red alert ribbon when a person dwells past the threshold, and bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
+This is the fastest way to see the pipeline end-to-end *with real inference*. It uses the bundled `assets/sample_factory.mp4`, loads the lightweight object detector, and opens an OpenCV window that mirrors the production dashboard — orange detection boxes with per-person track IDs, dashed `RESTRICTED ZONE` overlay, a sliding red alert ribbon when a person dwells past the threshold, and bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
 
 The Stage I demo uses the `restricted_access` rule because the shipped COCO weights only expose a `person` class. The rule engine already supports `helmet_mandatory`, `reflective_vest_mandatory`, and `lone_worker_forbidden`; Stage II flips the rule in `configs/site_example.yaml` once a helmet-trained checkpoint is in place.
 
@@ -130,7 +130,7 @@ For reviewers who want to see the production entry-point rather than the OpenCV 
 
 ```bash
 # Prerequisite: a lightweight detector checkpoint in the working directory
-# (auto-downloaded by Ultralytics on first run — ~6 MB)
+# (auto-downloaded on first run — ~6 MB)
 
 # Against a local video file (quickest for review)
 python -m src.inference \
@@ -163,7 +163,7 @@ python scripts/bench_torch.py --iters 20 --device auto
 # → results/bench_torch.json
 ```
 
-First run will download a lightweight object-detector checkpoint (~6 MB) via Ultralytics into the current directory.
+First run will download a lightweight object-detector checkpoint (~6 MB) into the current directory.
 
 ### Export ONNX for Hailo compilation (Stage II prep)
 
@@ -208,7 +208,7 @@ Team members are listed on the Stage I submission pitch deck.
 
 Code: Apache 2.0. Upstream model and runtime licenses:
 
-- Ultralytics YOLOv8 — AGPL-3.0 (Ultralytics also offers a commercial license for productization)
+- Open-source object detection framework — AGPL-3.0 (commercial license available from the upstream vendor for productization)
 - Qwen2.5-0.5B — Apache 2.0
 - llama.cpp — MIT
 - Hailo Dataflow Compiler / HailoRT — vendor license (Stage II access via ASUS / Hailo partnership)
