@@ -15,11 +15,11 @@ Stage I submission for the **2026 ASUS UGen AI League — Battlefield Lightning 
 
 **SentinelOps web dashboard** — 4-stream monitoring · event stream · rule editor · multi-site · `open webdemo/index.html`
 
-![SentinelOps dashboard](docs/img/webdemo_dashboard.png)
+![SentinelOps dashboard](docs/img/webdemo_dashboard.jpg)
 
 **Live inference** — on-device object detection + multi-object tracking + rule engine on laptop CPU · ~30 ms per frame · `python scripts/demo.py`
 
-![Live detection overlay](docs/img/live_detection.png)
+![Live detection overlay](docs/img/live_detection.jpg)
 
 ---
 
