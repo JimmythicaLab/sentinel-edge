@@ -67,10 +67,11 @@ End-to-end budget (Stage II target): frame → alert ≈ 80 ms. Written report i
 │   ├── reporter.py         # Local bilingual LLM reporter (template fallback)
 │   └── outputs.py          # MQTT / LINE / Teams sinks
 ├── scripts/
-│   ├── demo.py             # Live OpenCV demo with real object-detector inference
-│   ├── bench_torch.py      # Torch backend latency / FPS benchmark
-│   ├── export_onnx.py      # Export detector / pose to ONNX for Hailo
-│   └── compile_hailo.sh    # Reference Hailo Dataflow Compiler flow
+│   ├── demo.py                     # Live OpenCV demo with real object-detector inference
+│   ├── bench_torch.py              # Torch backend latency / FPS benchmark
+│   ├── export_onnx.py              # Export detector / pose to ONNX for Hailo
+│   ├── export_webdemo_tracks.py    # Pre-render track JSON that powers webdemo overlay
+│   └── compile_hailo.sh            # Reference Hailo Dataflow Compiler flow
 ├── tests/
 │   ├── test_rule_engine.py # Polygon + dwell + helmet-overlap tests
 │   └── test_reporter.py    # Template-fallback smoke tests
@@ -81,8 +82,10 @@ End-to-end budget (Stage II target): frame → alert ≈ 80 ms. Written report i
 ├── webdemo/                # Static web-based SentinelOps dashboard mockup
 │   ├── index.html          # Dashboard shell: 4 tabs, 4 cams, event stream
 │   ├── css/style.css       # ASUS-orange corporate style
-│   ├── js/app.js           # Tab routing, event trigger, modal, LINE popup
-│   └── assets/videos/      # Four looping camera feeds (CAM-01/07/23/42)
+│   ├── js/app.js           # Tab routing, JS mirror of rule_engine, overlay animation
+│   └── assets/
+│       ├── videos/         # Four looping camera feeds (CAM-01/07/23/42)
+│       └── tracks/         # Pre-rendered per-frame bbox JSON (from export script)
 ├── benchmark.md            # Reference baselines + Stage II target table
 └── requirements.txt
 ```
@@ -138,7 +141,7 @@ For reviewers who want to see the production entry-point rather than the OpenCV 
 
 # Against a local video file (quickest for review)
 python -m src.inference \
-    --source results/sample_factory.mp4 \
+    --source assets/sample_factory.mp4 \
     --config configs/site_example.yaml \
     --backend torch
 

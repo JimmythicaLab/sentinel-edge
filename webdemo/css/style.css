@@ -529,6 +529,17 @@ button { font-family: inherit; cursor: pointer; border: none; }
   font-size: 11px; color: var(--accent-l);
   margin-top: 4px;
 }
+.r-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  background: rgba(148,160,178,0.18);
+  color: var(--muted);
+  border-radius: 3px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.tag small { opacity: 0.7; font-weight: 400; margin-left: 4px; }
 
 .rule-editor {
   background: #0a1222;

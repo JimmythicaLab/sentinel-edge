@@ -78,7 +78,7 @@
   <section class="main-feed">
     <div class="feed-header">
       <div class="cam-title" id="mainCamTitle">
-        CAM-42 <span>· Loading Bay 3 · Helmet Mandatory</span>
+        CAM-42 <span>· Loading Bay 3 · Restricted Zone</span>
       </div>
       <div class="feed-time" id="feedTime">2026-10-14 23:47:00</div>
     </div>
@@ -165,13 +165,13 @@
         <tr><th>Time</th><th>Camera</th><th>Zone</th><th>Kind</th><th>Severity</th><th>Dispatched</th></tr>
       </thead>
       <tbody id="historyTbody">
-        <tr><td class="mono">2026-10-14 23:47:01</td><td>CAM-42</td><td>crane_zone</td><td><span class="tag alert">HELMET_MANDATORY</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
-        <tr><td class="mono">2026-10-14 21:12:34</td><td>CAM-07</td><td>forklift_radius</td><td><span class="tag alert">RESTRICTED_ACCESS</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT</td></tr>
-        <tr><td class="mono">2026-10-14 18:05:22</td><td>CAM-23</td><td>confined_space</td><td><span class="tag info">LONE_WORKER</span></td><td class="sev-med">MED</td><td>LINE</td></tr>
-        <tr><td class="mono">2026-10-14 14:33:17</td><td>CAM-42</td><td>crane_zone</td><td><span class="tag alert">VEST_MANDATORY</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
-        <tr><td class="mono">2026-10-14 10:21:09</td><td>CAM-07</td><td>textile_floor</td><td><span class="tag info">PERSON_COUNT</span></td><td class="sev-low">LOW</td><td>MQTT</td></tr>
-        <tr><td class="mono">2026-10-13 23:51:40</td><td>CAM-42</td><td>crane_zone</td><td><span class="tag alert">HELMET_MANDATORY</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
-        <tr><td class="mono">2026-10-13 19:44:11</td><td>CAM-23</td><td>sewing_line</td><td><span class="tag info">PERSON_COUNT</span></td><td class="sev-low">LOW</td><td>MQTT</td></tr>
+        <tr><td class="mono">2026-10-14 23:47:01</td><td>CAM-42</td><td>restricted_zone</td><td><span class="tag alert">RESTRICTED_ACCESS</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
+        <tr><td class="mono">2026-10-14 21:12:34</td><td>CAM-42</td><td>restricted_zone</td><td><span class="tag alert">RESTRICTED_ACCESS</span></td><td class="sev-high">HIGH</td><td>LINE · MQTT</td></tr>
+        <tr><td class="mono">2026-10-14 18:05:22</td><td>CAM-23</td><td>crane_zone</td><td><span class="tag info">LONE_WORKER <small>(sim)</small></span></td><td class="sev-med">MED</td><td>LINE</td></tr>
+        <tr><td class="mono">2026-10-14 14:33:17</td><td>CAM-07</td><td>loading_bay</td><td><span class="tag alert">VEST_MANDATORY <small>(sim)</small></span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
+        <tr><td class="mono">2026-10-14 10:21:09</td><td>CAM-07</td><td>loading_bay</td><td><span class="tag info">PERSON_COUNT <small>(sim)</small></span></td><td class="sev-low">LOW</td><td>MQTT</td></tr>
+        <tr><td class="mono">2026-10-13 23:51:40</td><td>CAM-23</td><td>crane_zone</td><td><span class="tag alert">HELMET_MANDATORY <small>(sim)</small></span></td><td class="sev-high">HIGH</td><td>LINE · MQTT · Strobe</td></tr>
+        <tr><td class="mono">2026-10-13 19:44:11</td><td>CAM-01</td><td>confined_space</td><td><span class="tag info">PERSON_COUNT <small>(sim)</small></span></td><td class="sev-low">LOW</td><td>MQTT</td></tr>
       </tbody>
     </table>
 
@@ -196,20 +196,20 @@
       <div class="rule-list">
         <h3>Site: taichung_plant_01</h3>
         <div class="rule-item active">
-          <div class="r-name">crane_zone (CAM-42)</div>
-          <div class="r-rules">helmet_mandatory · lone_worker_forbidden</div>
-        </div>
-        <div class="rule-item">
-          <div class="r-name">loading_bay (CAM-07)</div>
-          <div class="r-rules">reflective_vest_mandatory</div>
-        </div>
-        <div class="rule-item">
-          <div class="r-name">forklift_radius (CAM-07)</div>
+          <div class="r-name">restricted_zone (CAM-42)</div>
           <div class="r-rules">restricted_access · dwell_timer</div>
         </div>
         <div class="rule-item">
-          <div class="r-name">confined_space (CAM-23)</div>
-          <div class="r-rules">lone_worker_forbidden</div>
+          <div class="r-name">loading_bay (CAM-07)</div>
+          <div class="r-rules">reflective_vest_mandatory <span class="r-badge">Stage II</span></div>
+        </div>
+        <div class="rule-item">
+          <div class="r-name">crane_zone (CAM-23)</div>
+          <div class="r-rules">helmet_mandatory · lone_worker_forbidden <span class="r-badge">Stage II</span></div>
+        </div>
+        <div class="rule-item">
+          <div class="r-name">confined_space (CAM-01)</div>
+          <div class="r-rules">lone_worker_forbidden <span class="r-badge">Stage II</span></div>
         </div>
       </div>
 
@@ -224,15 +224,15 @@
   <span class="yk">weights:</span> <span class="yv">object_detector.pt</span>   <span class="yc"># Hailo HEF in Stage II</span>
 
 <span class="yk">zones:</span>
-  - <span class="yk">name:</span> <span class="yv">crane_zone</span>
+  - <span class="yk">name:</span> <span class="yv">restricted_zone</span>
     <span class="yk">camera:</span> <span class="yv">CAM-42</span>
-    <span class="yk">polygon:</span> [[0.3, 0.1], [0.9, 0.1], [0.9, 0.9], [0.3, 0.9]]
-    <span class="yk">rules:</span> [<span class="yv">helmet_mandatory</span>, <span class="yv">lone_worker_forbidden</span>]
+    <span class="yk">polygon:</span> [[0.05, 0.05], [0.95, 0.05], [0.95, 0.95], [0.05, 0.95]]
+    <span class="yk">rules:</span> [<span class="yv">restricted_access</span>]   <span class="yc"># Stage I live</span>
 
-  - <span class="yk">name:</span> <span class="yv">loading_bay</span>
-    <span class="yk">camera:</span> <span class="yv">CAM-07</span>
-    <span class="yk">polygon:</span> [[0.0, 0.5], [1.0, 0.5], [1.0, 1.0], [0.0, 1.0]]
-    <span class="yk">rules:</span> [<span class="yv">reflective_vest_mandatory</span>]
+  <span class="yc"># Stage II zones (fine-tuned detector required):</span>
+  - <span class="yk">name:</span> <span class="yv">crane_zone</span>
+    <span class="yk">camera:</span> <span class="yv">CAM-23</span>
+    <span class="yk">rules:</span> [<span class="yv">helmet_mandatory</span>, <span class="yv">lone_worker_forbidden</span>]
 
 <span class="yk">policies:</span>
   <span class="yk">min_dwell_frames:</span> <span class="yn">15</span>      <span class="yc"># ~0.5s @ 30fps</span>
