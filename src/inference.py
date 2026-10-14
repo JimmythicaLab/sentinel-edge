@@ -8,12 +8,11 @@ from __future__ import annotations
 import argparse
 import asyncio
 import time
+from dataclasses import replace
 from pathlib import Path
 
 import yaml
 from rich.console import Console
-from rich.live import Live
-from rich.table import Table
 
 from src.detectors import build_detector
 from src.outputs import OutputDispatcher
@@ -26,6 +25,20 @@ console = Console()
 def load_config(path: Path) -> dict:
     with open(path) as f:
         return yaml.safe_load(f)
+
+
+def _normalise(detections, frame):
+    """Convert pixel-space bboxes → 0..1 so the rule engine's polygon maths
+    stays resolution-agnostic. Detectors emit pixel coords; polygons in the
+    YAML config are normalised (per docs/style convention)."""
+    if frame is None or not detections:
+        return detections
+    h, w = frame.shape[:2]
+    return [
+        replace(d, xyxy=(d.xyxy[0] / w, d.xyxy[1] / h,
+                         d.xyxy[2] / w, d.xyxy[3] / h))
+        for d in detections
+    ]
 
 
 async def run(source: str, config_path: Path, backend: str) -> None:
@@ -47,7 +60,8 @@ async def run(source: str, config_path: Path, backend: str) -> None:
                 f"det={len(detections)}[/dim]"
             )
 
-        events = rules.evaluate(frame_idx, detections)
+        norm_dets = _normalise(detections, frame)
+        events = rules.evaluate(frame_idx, norm_dets)
         for event in events:
             stats["events"] += 1
             console.rule(f"[red]EVENT[/red] #{stats['events']} — {event.kind}")

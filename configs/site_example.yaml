@@ -1,24 +1,37 @@
 # Example site config. Each real deployment has its own file.
+#
+# Zone polygons use normalised image coordinates (0..1); the pipeline
+# converts detector pixel bboxes to this space before rule evaluation.
 site: taichung_plant_01
 
 model:
-  weights: yolov8n.pt   # replace with Hailo-compiled HEF in Stage II
+  weights: yolov8n.pt   # Stage I = generic COCO weights (person only).
+                        # Stage II: replace with the Hailo-compiled HEF of
+                        # a helmet / vest-trained checkpoint.
 
 zones:
-  - name: crane_zone
+  # Stage I demo zone — any `person` dwelling in this box fires an alert.
+  # Works out of the box with COCO weights.
+  - name: restricted_zone
     camera: CAM-42
-    polygon: [[0.3, 0.1], [0.9, 0.1], [0.9, 0.9], [0.3, 0.9]]
-    rules: [helmet_mandatory, lone_worker_forbidden]
+    polygon: [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]]
+    rules: [restricted_access]
+    severity: HIGH
 
-  - name: loading_bay
-    camera: CAM-07
-    polygon: [[0.0, 0.5], [1.0, 0.5], [1.0, 1.0], [0.0, 1.0]]
-    rules: [reflective_vest_mandatory]
+  # ----- Stage II zones (require a helmet/vest-aware detector) -----
+  # - name: crane_zone
+  #   camera: CAM-42
+  #   polygon: [[0.3, 0.1], [0.9, 0.1], [0.9, 0.9], [0.3, 0.9]]
+  #   rules: [helmet_mandatory, lone_worker_forbidden]
+  #
+  # - name: loading_bay
+  #   camera: CAM-07
+  #   polygon: [[0.0, 0.5], [1.0, 0.5], [1.0, 1.0], [0.0, 1.0]]
+  #   rules: [reflective_vest_mandatory]
 
 policies:
-  min_dwell_frames: 15      # ~0.5s @ 30fps
-  helmet_confidence: 0.5
-  min_track_age: 10
+  min_dwell_frames: 15      # ~0.5 s @ 30 fps
+  cooldown_frames: 300      # ~10 s — one alert per track per window
 
 reporter:
   model_path: null          # drop a Qwen2.5-0.5B.gguf path here for live LLM

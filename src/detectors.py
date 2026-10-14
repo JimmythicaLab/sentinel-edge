@@ -33,7 +33,9 @@ class TorchDetector(Detector):
         self.model = YOLO(weights)
 
     async def stream(self, source):  # type: ignore[override]
-        results = self.model.track(source=source, stream=True, persist=True)
+        results = self.model.track(
+            source=source, stream=True, persist=True, verbose=False,
+        )
         for i, r in enumerate(results):
             dets: list[Detection] = []
             if r.boxes is None:

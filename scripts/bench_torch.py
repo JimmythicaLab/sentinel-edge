@@ -1,21 +1,21 @@
 """Benchmark the Torch backend on the host machine.
 
-Measures single-stream FPS and per-frame latency on CPU and (optional) GPU.
-Produces results/bench_torch.json for the deck's benchmark table.
+Measures single-stream FPS and per-frame latency on CPU and (optional) GPU
+or MPS. Produces results/bench_torch.json, which populates the Stage I
+"measured" column in benchmark.md.
 
 Usage:
-    python scripts/bench_torch.py                 # all backends, default source
+    python scripts/bench_torch.py                 # auto-detect devices
     python scripts/bench_torch.py --device cpu    # CPU only
     python scripts/bench_torch.py --source path/to/video.mp4
 
-The numbers here are the Stage I reference measurement — Hailo INT8 numbers
-are produced from scripts/bench_hailo.py once a UGen300 is available.
+Stage II will add a sibling scripts/bench_hailo.py once a UGen300 unit
+and the HailoRT runtime are available.
 """
 from __future__ import annotations
 
 import argparse
 import json
-import os
 import time
 from pathlib import Path
 

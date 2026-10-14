@@ -91,9 +91,33 @@ Expected: `8 passed in <1s`. These exercise the rule-engine geometry, dwell coun
 python scripts/demo.py
 ```
 
-Downloads a short factory sample video on first run, loads YOLOv8-n, and opens an OpenCV window that mirrors the production dashboard style — orange detection boxes with per-person track IDs, dashed `RESTRICTED ZONE` overlay, a sliding red alert ribbon when a person dwells past the threshold, and bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
+This is the fastest way to see the pipeline end-to-end. It downloads a short factory sample video on first run, loads YOLOv8-n, and opens an OpenCV window that mirrors the production dashboard — orange detection boxes with per-person track IDs, dashed `RESTRICTED ZONE` overlay, a sliding red alert ribbon when a person dwells past the threshold, and bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
 
 The Stage I demo uses the `restricted_access` rule because the shipped COCO weights only expose a `person` class. The rule engine already supports `helmet_mandatory`, `reflective_vest_mandatory`, and `lone_worker_forbidden`; Stage II flips the rule in `configs/site_example.yaml` once a helmet-trained checkpoint is in place.
+
+### Run the headless inference loop (advanced)
+
+For reviewers who want to see the production entry-point rather than the OpenCV demo, `src/inference.py` is the same pipeline without the window:
+
+```bash
+# Prerequisite: yolov8n.pt in the working directory (Ultralytics auto-downloads)
+
+# Against a local video file (quickest for review)
+python -m src.inference \
+    --source results/sample_factory.mp4 \
+    --config configs/site_example.yaml \
+    --backend torch
+
+# Against an RTSP source
+python -m src.inference \
+    --source rtsp://<your-cam>/stream \
+    --config configs/site_example.yaml \
+    --backend torch
+```
+
+Events print to stdout and are dispatched via any output sink enabled in `configs/site_example.yaml` (MQTT / LINE Notify / Teams Webhook — all `null` by default so no network calls happen out of the box).
+
+For the LLM report path, drop a `qwen2.5-0.5b.gguf` under `reporter.model_path` in the config. If no model file is present the reporter falls back to a deterministic rule-aware template.
 
 Flags:
 - `--source path/to/video.mp4` — use your own clip
@@ -110,28 +134,6 @@ python scripts/bench_torch.py --iters 20 --device auto
 ```
 
 First run will download `yolov8n.pt` (~6 MB) from Ultralytics into the current directory.
-
-### Run the live inference loop (dev mode)
-
-The Torch backend works on any laptop and is enough for the Stage I demo recording.
-
-```bash
-# Prerequisite: yolov8n.pt in the working directory (downloaded by Ultralytics on first use)
-
-# Against an RTSP source
-python -m src.inference \
-    --source rtsp://<your-cam>/stream \
-    --config configs/site_example.yaml \
-    --backend torch
-
-# Or against a local video file
-python -m src.inference \
-    --source path/to/demo_video.mp4 \
-    --config configs/site_example.yaml \
-    --backend torch
-```
-
-For the LLM report path, drop a `qwen2.5-0.5b.gguf` under a path referenced in `configs/site_example.yaml` (`reporter.model_path`). If no model file is present the reporter falls back to a deterministic template, which is enough for CI and the Stage I demo.
 
 ### Export ONNX for Hailo compilation (Stage II prep)
 
