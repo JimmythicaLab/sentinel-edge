@@ -91,7 +91,9 @@ Expected: `8 passed in <1s`. These exercise the rule-engine geometry, dwell coun
 python scripts/demo.py
 ```
 
-Downloads a short factory sample video on first run, loads YOLOv8-n, and opens an OpenCV window that mirrors the production dashboard style — orange detection boxes, red `NO HELMET` label, sliding red alert ribbon, bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
+Downloads a short factory sample video on first run, loads YOLOv8-n, and opens an OpenCV window that mirrors the production dashboard style — orange detection boxes with per-person track IDs, dashed `RESTRICTED ZONE` overlay, a sliding red alert ribbon when a person dwells past the threshold, and bilingual EN + ZH incident reports printed to stdout. Every triggered event is appended to `results/events.jsonl`.
+
+The Stage I demo uses the `restricted_access` rule because the shipped COCO weights only expose a `person` class. The rule engine already supports `helmet_mandatory`, `reflective_vest_mandatory`, and `lone_worker_forbidden`; Stage II flips the rule in `configs/site_example.yaml` once a helmet-trained checkpoint is in place.
 
 Flags:
 - `--source path/to/video.mp4` — use your own clip

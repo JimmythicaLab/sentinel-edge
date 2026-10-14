@@ -47,14 +47,29 @@ class BilingualReporter:
 
     @staticmethod
     def _template_report(event) -> Report:
+        """Deterministic fallback used when no LLM weights are loaded.
+
+        Wording is intentionally rule-agnostic — the rule-engine supplies the
+        structured fields (kind, zone, camera, dwell_frames), the template
+        only phrases them. Downstream consumers that need PPE-specific or
+        helmet-specific wording should either load the LLM path or extend
+        this template with per-kind branches.
+        """
+        kind_zh = {
+            "HELMET_MANDATORY": "未配戴安全帽",
+            "REFLECTIVE_VEST_MANDATORY": "未穿反光背心",
+            "RESTRICTED_ACCESS": "進入限制區域",
+            "LONE_WORKER_FORBIDDEN": "單人作業",
+        }.get(event.kind, "違規事件")
+        kind_en = event.kind.replace("_", " ").lower()
         zh = (
-            f"[{event.camera_id} {event.zone}] 偵測到人員未配戴安全帽, "
-            f"持續 {event.dwell_frames} 幀。建議通知現場主管並重新宣導 PPE 規範。"
+            f"[{event.camera_id} {event.zone}] 偵測到人員{kind_zh}, "
+            f"持續 {event.dwell_frames} 幀。建議通知現場主管複查。"
         )
         en = (
-            f"Unprotected worker detected in {event.zone} on {event.camera_id} "
-            f"for {event.dwell_frames} frames. Supervisor dispatch and PPE "
-            f"briefing recommended."
+            f"{kind_en.capitalize()} detected in {event.zone} on "
+            f"{event.camera_id} after {event.dwell_frames} frames of dwell. "
+            f"Supervisor review recommended."
         )
         return Report(zh=zh, en=en, severity="HIGH")
 

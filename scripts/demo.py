@@ -4,18 +4,18 @@ What it does:
   1. Downloads a short factory sample video on first run (<10 MB).
   2. Loads a lightweight YOLOv8-n detector (Ultralytics; auto-downloads yolov8n.pt).
   3. Opens an OpenCV window that mirrors the production dashboard style:
-       - orange detection boxes with class + confidence
-       - red "HELMET MANDATORY ZONE" overlay
+       - orange detection boxes with person id + confidence
+       - dashed "RESTRICTED ZONE" overlay
        - red alert ribbon slides up when a person dwells in the zone
        - bilingual (EN + Traditional Chinese) incident report printed to stdout
   4. Writes every triggered event to results/events.jsonl so reviewers can
-     diff before/after runs.
+     inspect the structured log afterwards.
 
-The detection logic uses the real `src.rule_engine.RuleEngine` from this repo
-(polygon zone, dwell counter, debounce). COCO's `person` class acts as the
-proxy for "unprotected worker" because the Stage I checkpoint ships generic
-weights; Stage II swaps in a helmet-trained model and the rule engine code
-does not change.
+The detection logic uses the real `src.rule_engine.RuleEngine` from this
+repo (polygon zone, dwell counter, cooldown). The Stage I demo runs the
+`restricted_access` rule because COCO weights only ship a `person` class.
+Stage II swaps in a helmet-trained checkpoint and flips the rule to
+`helmet_mandatory` in configs/site_example.yaml — no other code changes.
 
 Run:
     python scripts/demo.py                     # downloads sample video
@@ -131,7 +131,7 @@ def _draw_header(frame, w: int):
     cv2.rectangle(header, (0, 0), (w, 44), (0, 0, 0), -1)
     cv2.addWeighted(header, 0.55, frame, 0.45, 0, dst=frame)
 
-    cv2.putText(frame, "CAM-42  ·  Loading Bay 3  ·  Helmet Mandatory",
+    cv2.putText(frame, "CAM-42  ·  Loading Bay 3  ·  Restricted Zone",
                 (16, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.6, WHITE, 1, cv2.LINE_AA)
 
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -160,11 +160,18 @@ def _draw_detection_box(frame, det: Det, w: int, h: int, violating: bool):
     if violating:
         tag = "IN RESTRICTED ZONE"
         (tw2, th2), _ = cv2.getTextSize(tag, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
-        # Place label above the box if there's no room to the right
-        tx = x2 + 8 if (x2 + tw2 + 24) < w else x1
-        ty = y1 + 10 if tx == x2 + 8 else y2 + th2 + 16
-        cv2.rectangle(frame, (tx, ty),
-                      (tx + tw2 + 16, ty + th2 + 14), RED, -1)
+        pad_x, pad_y = 16, 14
+        box_w, box_h = tw2 + pad_x, th2 + pad_y
+        # Prefer right of the person; otherwise left; otherwise above / below
+        if x2 + 8 + box_w <= w:
+            tx, ty = x2 + 8, y1 + 10
+        elif x1 - 8 - box_w >= 0:
+            tx, ty = x1 - 8 - box_w, y1 + 10
+        elif y1 - box_h - 8 >= 0:
+            tx, ty = max(x1, 0), y1 - box_h - 8
+        else:
+            tx, ty = max(x1, 0), min(y2 + 8, h - box_h)
+        cv2.rectangle(frame, (tx, ty), (tx + box_w, ty + box_h), RED, -1)
         cv2.putText(frame, tag, (tx + 8, ty + th2 + 8),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, WHITE, 1, cv2.LINE_AA)
 
