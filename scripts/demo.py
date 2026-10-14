@@ -2,7 +2,7 @@
 
 What it does:
   1. Downloads a short factory sample video on first run (<10 MB).
-  2. Loads a lightweight YOLOv8-n detector (Ultralytics; auto-downloads yolov8n.pt).
+  2. Loads a lightweight object detector (open-source; auto-downloaded on first run).
   3. Opens an OpenCV window that mirrors the production dashboard style:
        - orange detection boxes with person id + confidence
        - dashed "RESTRICTED ZONE" overlay

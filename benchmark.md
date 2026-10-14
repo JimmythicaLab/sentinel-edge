@@ -1,6 +1,6 @@
 # SentinelEdge — Benchmark Reference & Stage II Plan
 
-> **Stage I honesty note:** every number in this file that is not a *public literature baseline* is a **target to be measured in Stage II** on real UGen300 hardware, not a claim of measured performance. Model names below use the open-source YOLO family for Stage I prototyping; the production model choice is finalised in Stage II after INT8 drop measurement.
+> **Stage I honesty note:** every number in this file that is not a *public literature baseline* is a **target to be measured in Stage II** on real UGen300 hardware, not a claim of measured performance. The Stage I prototype uses an open-source lightweight object detector; the production model choice is finalised in Stage II after INT8 drop measurement.
 
 ## 1. Public FP32 baselines (reference figures from third-party sources)
 
@@ -34,7 +34,7 @@ Reference figures from the official ASUS UGen300 datasheet (Hailo-10H) for commo
 | MobileNet-V2 (224²)      | 2944         | ASUS UGen300 datasheet |
 | EfficientNet-M (240²)    | 508          | ASUS UGen300 datasheet |
 
-These are the public reference numbers we calibrate our own YOLOv8-family targets against. Our targets below are intentionally conservative.
+These are the public reference numbers we calibrate our own object-detector targets against. Our targets below are intentionally conservative.
 
 | Metric                                                | Target        | Why it matters                                 |
 |-------------------------------------------------------|---------------|------------------------------------------------|
@@ -57,7 +57,7 @@ Multi-stream scaling is deliberately not listed as a numeric target at Stage I; 
 
 ## 5. Current status (Stage I)
 
-- [x] Dataset survey and candidate model selection (open-source YOLO family for prototyping).
+- [x] Dataset survey and candidate model selection (open-source lightweight detector for Stage I prototyping).
 - [x] Pipeline skeleton runs on Torch backend (`src/inference.py`).
 - [x] Rule engine with polygon zones, dwell counters, helmet / vest / lone-worker / restricted-access rules (`src/rule_engine.py`).
 - [x] Reporter template-fallback path (`src/reporter.py`); LLM path tested without live weights.

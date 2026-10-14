@@ -13,20 +13,13 @@ Stage I submission for the **2026 ASUS UGen AI League — Battlefield Lightning 
 
 ---
 
-<table>
-<tr>
-<td width="50%" align="center">
-<b>SentinelOps web dashboard</b><br/>
-<sub>4-stream monitoring · event stream · rule editor · multi-site · <code>open webdemo/index.html</code></sub><br/>
-<img src="docs/img/webdemo_dashboard.png" alt="SentinelOps dashboard"/>
-</td>
-<td width="50%" align="center">
-<b>Live inference</b><br/>
-<sub>YOLOv8-n + ByteTrack + rule engine on laptop CPU · ~30 ms per frame · <code>python scripts/demo.py</code></sub><br/>
-<img src="docs/img/live_detection.png" alt="Live detection overlay"/>
-</td>
-</tr>
-</table>
+**SentinelOps web dashboard** — 4-stream monitoring · event stream · rule editor · multi-site · `open webdemo/index.html`
+
+![SentinelOps dashboard](docs/img/webdemo_dashboard.png)
+
+**Live inference** — on-device object detection + multi-object tracking + rule engine on laptop CPU · ~30 ms per frame · `python scripts/demo.py`
+
+![Live detection overlay](docs/img/live_detection.png)
 
 ---
 
@@ -74,7 +67,7 @@ End-to-end budget (Stage II target): frame → alert ≈ 80 ms. Written report i
 │   ├── reporter.py         # Local bilingual LLM reporter (template fallback)
 │   └── outputs.py          # MQTT / LINE / Teams sinks
 ├── scripts/
-│   ├── demo.py             # Live OpenCV demo with real YOLOv8 inference
+│   ├── demo.py             # Live OpenCV demo with real object-detector inference
 │   ├── bench_torch.py      # Torch backend latency / FPS benchmark
 │   ├── export_onnx.py      # Export detector / pose to ONNX for Hailo
 │   └── compile_hailo.sh    # Reference Hailo Dataflow Compiler flow
@@ -136,7 +129,8 @@ The Stage I demo uses the `restricted_access` rule because the shipped COCO weig
 For reviewers who want to see the production entry-point rather than the OpenCV demo, `src/inference.py` is the same pipeline without the window:
 
 ```bash
-# Prerequisite: yolov8n.pt in the working directory (Ultralytics auto-downloads)
+# Prerequisite: a lightweight detector checkpoint in the working directory
+# (auto-downloaded by Ultralytics on first run — ~6 MB)
 
 # Against a local video file (quickest for review)
 python -m src.inference \
@@ -169,7 +163,7 @@ python scripts/bench_torch.py --iters 20 --device auto
 # → results/bench_torch.json
 ```
 
-First run will download `yolov8n.pt` (~6 MB) from Ultralytics into the current directory.
+First run will download a lightweight object-detector checkpoint (~6 MB) via Ultralytics into the current directory.
 
 ### Export ONNX for Hailo compilation (Stage II prep)
 
